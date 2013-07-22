@@ -5,7 +5,6 @@ import com.dickie.wwar.shared.Location;
 import com.dickie.wwar.shared.Mover;
 import com.dickie.wwar.shared.Order;
 import com.dickie.wwar.shared.OrderHelper;
-import com.dickie.wwar.shared.Player;
 
 public class DamageHelper implements OrderHelper,java.io.Serializable {
 	private static final long serialVersionUID = 1L;

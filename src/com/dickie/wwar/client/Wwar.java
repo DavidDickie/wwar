@@ -37,8 +37,6 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.TextBoxBase;
-import com.google.gwt.user.client.ui.ValueBoxBase.TextAlignment;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
@@ -140,8 +138,6 @@ public class Wwar implements EntryPoint {
 			public void onKeyPress(KeyPressEvent event) {
 				if (event.getCharCode() == KeyCodes.KEY_ENTER) {
 					getGame();
-					setActivePlayer(playerNameTextBox.getText(),
-							passwordTextBox.getText());
 				}
 			}
 		});
@@ -272,41 +268,7 @@ public class Wwar implements EntryPoint {
 		btnPlayers.setStyleName("button white medium");
 		btnPlayers.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				StringBuffer sb = new StringBuffer();
-				sb.append("<table><tr><td>Player</td><td>Spells</td><td>Cards</td><td>Towns</td><td>Total</td></tr>");
-				for (Player pl : game.getPlayers()) {
-					int towns = 0;
-					for (Location loc : game.getLocations()) {
-						if (loc.isLocked()) {
-							if (loc.getLockedBy().equals(pl.getName())) {
-								towns++;
-							}
-						} else {
-							List<Mover> ms = game.getMoversAtLocation(loc);
-							if (ms.size() > 0
-									&& ms.get(0).getOwnerName()
-											.equals(pl.getName())) {
-								towns++;
-							}
-						}
-					}
-					int numCards = pl.getHand().size()
-							+ pl.getDrawPile().size()
-							+ pl.getDiscardPile().size();
-					sb.append("<tr><td>")
-							.append(pl.getName())
-							.append("</td><td>")
-							.append(pl.getKnownSpells().size())
-							.append("</td><td>")
-							.append(numCards)
-							.append("</td><td>")
-							.append(towns)
-							.append("</td><td>")
-							.append(numCards + pl.getKnownSpells().size() * 2
-									+ towns * 3).append("</td></tr>");
-				}
-				sb.append("</table>");
-				displayMessage(sb.toString());
+				TurnReportPanel.showPlayers(game);
 			}
 		});
 
@@ -695,7 +657,14 @@ public class Wwar implements EntryPoint {
 		for (Spell spell : order.castable(activePlayer.getHand())) {
 			if (spell.isInvisible()) {
 				continue;
+			} 
+			if (spell.name.equals("Create Golem")){
+				if (!activePlayer.getLocation().getType().equals(Location.LocType.Mystical) ||
+				!containsTwoMana(activePlayer.getHand())){
+					continue;
+				}				
 			}
+
 			if (spell.startSpell
 					|| activePlayer.getKnownSpells().contains(spell)) {
 
@@ -713,6 +682,20 @@ public class Wwar implements EntryPoint {
 		damageIntegerBox.setValue(Integer.valueOf(activePlayer.getDamage()));
 		drawMap();
 		redraw.clear();
+	}
+
+	private boolean containsTwoMana(List<Card> hand) {
+		boolean one = false;
+		for (Card card: hand){
+			if (card.getType().equals(Card.CardType.Mana)){
+				if (one){
+					return true;
+				} else {
+					one = true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public boolean locationSelect = false;

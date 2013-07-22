@@ -147,7 +147,7 @@ public class Player implements java.io.Serializable, Mover, Storable {
 		String[] spells = s.split("/");
 		knownSpells.clear();
 		for (int i=0; i < spells.length; i++){
-			addKnownSpells(Spell.getSpell(s));
+			addKnownSpells(Spell.getSpell(spells[i]));
 		}
 	}
 

@@ -2,6 +2,9 @@ package com.dickie.wwar.client;
 
 import java.util.List;
 
+import com.dickie.wwar.shared.Game;
+import com.dickie.wwar.shared.Location;
+import com.dickie.wwar.shared.Mover;
 import com.dickie.wwar.shared.Player;
 import com.dickie.wwar.shared.PlayerMessage;
 import com.dickie.wwar.shared.Spell;
@@ -10,6 +13,52 @@ import com.google.gwt.user.client.ui.DecoratorPanel;
 public class TurnReportPanel extends DecoratorPanel {
 
 	public TurnReportPanel() {	
+	}
+	
+	public static void showPlayers(Game game){
+		StringBuffer sb = new StringBuffer();
+		sb.append("<table class=\"ms-color2-main\" style=\"width: 100%\">");
+		sb.append("<!-- fpstyle: 9,011111100 -->");
+		sb.append("<tr>");
+		sb.append("<td class=\"ms-color2-tl\">Player</td>");
+		sb.append("<td class=\"ms-color2-top\">Spells</td>");
+		sb.append("<td class=\"ms-color2-top\">Cards</td>");
+		sb.append("<td class=\"ms-color2-top\">Towns</td>");
+		sb.append("<td class=\"ms-color2-top\">Total</td></tr>");
+		for (Player pl : game.getPlayers()) {
+			int towns = 0;
+			for (Location loc : game.getLocations()) {
+				if (loc.isLocked()) {
+					if (loc.getLockedBy().equals(pl.getName())) {
+						towns++;
+					}
+				} else {
+					List<Mover> ms = game.getMoversAtLocation(loc);
+					if (ms.size() > 0
+							&& ms.get(0).getOwnerName()
+									.equals(pl.getName())) {
+						towns++;
+					}
+				}
+			}
+			int numCards = pl.getHand().size()
+					+ pl.getDrawPile().size()
+					+ pl.getDiscardPile().size();
+			sb.append("<tr><td class=\"ms-color2-even\">")
+					.append(pl.getName())
+					.append("</td><td class=\"ms-color2-even\">")
+					.append(pl.getKnownSpells().size())
+					.append("</td><td class=\"ms-color2-even\">")
+					.append(numCards)
+					.append("</td><td class=\"ms-color2-even\">")
+					.append(towns)
+					.append("</td><td class=\"ms-color2-even\">")
+					.append(numCards + pl.getKnownSpells().size() * 2
+							+ towns * 3).append("</td></tr>");
+		}
+		sb.append("</table>");
+		DisplayHtmlDialog.getInstance().display("Player Info", sb.toString());
+
 	}
 	
 	public static void showMessages (List<PlayerMessage> msgs){
