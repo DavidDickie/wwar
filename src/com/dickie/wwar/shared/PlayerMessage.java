@@ -2,7 +2,7 @@ package com.dickie.wwar.shared;
 
 import java.util.HashMap;
 
-public class PlayerMessage implements java.io.Serializable, Storable {
+public class PlayerMessage implements java.io.Serializable, Storable, Comparable {
 	private static final long serialVersionUID = 1L;
 	
 	public String getPlayerName() {
@@ -33,6 +33,7 @@ public class PlayerMessage implements java.io.Serializable, Storable {
 		hm.put("playerName", playerName);
 		hm.put("message", message);
 		hm.put("allSee", new Boolean(allSee));
+		hm.put("name", getName());
 		return hm;
 	}
 	@Override
@@ -44,6 +45,13 @@ public class PlayerMessage implements java.io.Serializable, Storable {
 	@Override
 	public String getName() {
 		return playerName + "-" + message;
+	}
+	@Override
+	public int compareTo(Object arg0) {
+		if (arg0 instanceof PlayerMessage){
+			return ((PlayerMessage)arg0).getPlayerName().compareTo(getPlayerName());
+		}
+		throw new RuntimeException("Cannot compare PlayerMessage to " + arg0.getClass().getName());
 	}
 
 }

@@ -13,11 +13,11 @@ public class BuySpellHelper implements OrderHelper,java.io.Serializable {
 	public String executeOrder(Game game, boolean server, Order order) {
 			Spell spell = Spell.getSpell(order.getPurchasedSpell());
 			Player player = game.getPlayer(order.getOwnerName());
-			player.addKnownSpells(spell);
 			if (player.getGold() < spell.cards.length){
 				game.addMessage(player.getName(), "Insufficient Gold", true);
 				return "Insufficient Gold";
 			}
+			player.addKnownSpells(spell);
 			player.setGold(player.getGold() - spell.cards.length);
 			game.addMessage(player.getName(), player.getName() + " bought " + spell.toString(), true);
 			return null;

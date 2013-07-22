@@ -1,5 +1,6 @@
 package com.dickie.wwar.shared.orderhelpers;
 
+import com.dickie.wwar.shared.Card;
 import com.dickie.wwar.shared.Game;
 import com.dickie.wwar.shared.Order;
 import com.dickie.wwar.shared.OrderHelper;
@@ -14,9 +15,14 @@ public class DiscardHelper implements OrderHelper,java.io.Serializable {
 		Player player = game.getPlayer(order.getMover().getOwnerName());
 		player.discardCardFromHand(order.getCardType());
 		if (server) {
-			String s = order.getMover().getOwnerName() + " discards " + order.getCardType().toString();
+			String s = "discards " + order.getCardType().toString();
+			if (order.getCardType().equals(Card.CardType.Mana)){
+				s = s+ "; gets a gold";
+			}
 			game.addMessage(order.getMover().getOwnerName(), s, true);
-			return s;
+		}
+		if (order.getCardType().equals(Card.CardType.Mana)){
+			player.setGold(player.getGold() + 1);
 		}
 		return null;
 	}

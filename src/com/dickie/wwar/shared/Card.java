@@ -14,10 +14,10 @@ public class Card implements java.io.Serializable,Storable {
 		this.type = type;
 	}
 	public String getOwnerName() {
-		return ownerName;
+		return owner.getName();
 	}
-	public void setOwnerName(String ownerName) {
-		this.ownerName = ownerName;
+	public void setOwner(Player owner) {
+		this.owner = owner;
 	}
 	public Where getWhere() {
 		return where;
@@ -32,7 +32,7 @@ public class Card implements java.io.Serializable,Storable {
 		this.locName = locName;
 	}
 	private CardType type;
-	private String ownerName;
+	private Player owner;
 	private Where where;
 	private String locName;
 	
@@ -57,17 +57,25 @@ public class Card implements java.io.Serializable,Storable {
 			throw new RuntimeException("D5 roll returned " + dieRoll);
 		}
 	}
+	
+	public static Card getCard(CardType type){
+		Card card = new Card();
+		card.setType(type);;
+		return card;
+	}
+	
 	@Override
 	public HashMap<String, Object> getProps() {
 		HashMap<String, Object> hm = new HashMap<String, Object>();
-		hm.put("ownerName", ownerName);
+		hm.put("ownerName", owner.getName());
 		hm.put("where", where.toString());
-		hm.put("cardType", type.toString());		
+		hm.put("cardType", type.toString());	
+		hm.put("name", getName());
 		return hm;
 	}
 	@Override
 	public void setProperties(Game game, HashMap<String, Object> props) {
-		setOwnerName((String)props.get("ownerName"));
+		setOwner(game.getPlayer((String)props.get("ownerName")));
 		setWhere(Where.valueOf((String)props.get("where")));
 		setType(CardType.valueOf((String)props.get("cardType")));
 	}

@@ -79,7 +79,10 @@ public class Player implements java.io.Serializable, Mover, Storable {
 		return knownSpells;
 	}
 	public void addKnownSpells(Spell spell) {
-		System.out.println("Bought " + spell.toString());
+		if (spell == null){
+			return;
+		}
+		//System.out.println("Bought " + spell.toString());
 		knownSpells.add(spell);
 	}
 	public int getTempPassThrough() {
@@ -119,7 +122,34 @@ public class Player implements java.io.Serializable, Mover, Storable {
 	private int gold;
 	private boolean hasMoved;
 	
+	public void update(Player p){
+		this.name = p.name;
+		this.Npr = p.Npr;
+		this.password = p.password;
+	}
 	
+	private String convertSpellsToString(){
+		
+		StringBuffer sb = new StringBuffer();
+		if (knownSpells == null){
+			return "";
+		}
+		for (Spell spell : knownSpells){
+			if (spell == null){
+				continue;
+			}
+			sb.append(spell.name).append("/");
+		}
+		return sb.toString();
+	}
+	
+	private void convertStringToSpells(String s){
+		String[] spells = s.split("/");
+		knownSpells.clear();
+		for (int i=0; i < spells.length; i++){
+			addKnownSpells(Spell.getSpell(s));
+		}
+	}
 
 	@Override
 	public HashMap<String, Object> getProps() {
@@ -139,6 +169,7 @@ public class Player implements java.io.Serializable, Mover, Storable {
 		hm.put("turnComplete", new Boolean(turnComplete));
 		hm.put("npr", new Boolean(Npr));
 		hm.put("location", location.getName());
+		hm.put("spells", convertSpellsToString());
 		return hm;
 	}
 	@Override
@@ -158,6 +189,7 @@ public class Player implements java.io.Serializable, Mover, Storable {
 		setTurnComplete(((Boolean)props.get("turnComplete")).booleanValue());
 		setNpr(((Boolean)props.get("npr")).booleanValue());
 		setLocation(game.getLocation(props.get("location").toString()));
+		convertStringToSpells(props.get("spells").toString());
 	}
 	
 	public int getPassThroughPoints() {
@@ -203,7 +235,7 @@ public class Player implements java.io.Serializable, Mover, Storable {
 		this.color = color;
 	}
 	public void putCardOnDiscard(Card card){
-		card.setOwnerName(name);
+		card.setOwner(this);
 		card.setWhere(Where.discardPile);
 		discardPile.add(card);
 	}
@@ -211,26 +243,8 @@ public class Player implements java.io.Serializable, Mover, Storable {
 	public void discardRestOfHand(Game game){
 		int totalMana = 0;
 		int totalOther = 0;
+		game.addMessage(getName(), getName() + " held " + getHand().size() + " cards", true);
 		
-		for (int i = hand.size()-1; i >= 0; i--){
-			Card card = hand.get(i);
-			if (card.getType().equals(Card.CardType.Mana)){
-				totalMana++;
-				setGold(getGold()+1);
-				card.setWhere(Card.Where.discardPile);
-				discardPile.add(card);
-				hand.remove(i);
-			} else {
-				totalOther++;
-			}	
-			
-		}
-		if (totalMana > 0){
-			game.addMessage(getName(), getName() + " discarded " + totalMana + " Mana cards from his hand for gold", true);
-		}
-		if (totalOther > 0){
-			game.addMessage(getName(), getName() + " held " + totalOther + " non-mana cards", true);
-		}
 
 	}
 	
@@ -271,7 +285,7 @@ public class Player implements java.io.Serializable, Mover, Storable {
 		Card card = new Card();
 		card.setType(CardType.valueOf(cardType));
 		card.setWhere(Card.Where.hand);
-		card.setOwnerName(name);
+		card.setOwner(this);
 		hand.add(card);
 	}
 	
@@ -279,7 +293,7 @@ public class Player implements java.io.Serializable, Mover, Storable {
 		Card card = new Card();
 		card.setType(CardType.valueOf(cardType));
 		card.setWhere(Card.Where.discardPile);
-		card.setOwnerName(name);
+		card.setOwner(this);
 		discardPile.add(card);
 	}
 	
@@ -287,7 +301,7 @@ public class Player implements java.io.Serializable, Mover, Storable {
 		Card card = new Card();
 		card.setType(CardType.valueOf(cardType));
 		card.setWhere(Card.Where.drawPile);
-		card.setOwnerName(name);
+		card.setOwner(this);
 		drawPile.add(card);
 	}
 	
@@ -340,7 +354,7 @@ public class Player implements java.io.Serializable, Mover, Storable {
 			throw new RuntimeException("Tried to delete a card from " + name + "'s hand, but there isn't one");
 		}
 		hand.remove(drawn);
-		System.out.println(getName() + " removed " + drawn.toString() + " from his hand");
+		System.out.println(getName() + " removed " + drawn.toString() + " from his deck");
 	}
 	
 	public String getDrawDistribution(){

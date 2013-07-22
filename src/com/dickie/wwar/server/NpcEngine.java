@@ -60,11 +60,13 @@ public class NpcEngine {
 	
 	private void doDiscardOrders(Player player, List<Order> orders,
 			List<Card> cards) {
+		ArrayList<Card.CardType> disCards = new ArrayList<Card.CardType>();
 		for (Card card : cards){
 			if (card.getType().equals(Card.CardType.Air) ||
 					card.getType().equals(Card.CardType.Water) ||
 					card.getType().equals(Card.CardType.Earth) ||
-					card.getType().equals(Card.CardType.Fire)){
+					card.getType().equals(Card.CardType.Fire) ||
+					card.getType().equals(Card.CardType.Mana)){
 				Order order = new Order();
 				order.setPlayer(player);
 				order.setOrderType(Order.OrderType.Magic);
@@ -72,7 +74,11 @@ public class NpcEngine {
 				order.setCardType(card.getType());
 				//removeCards(cards, order.getSpell());
 				orders.add(order);
+				disCards.add(card.getType());
 			}
+		}
+		for (Card.CardType type: disCards){
+			discardCardFromHand(cards, type);
 		}
 		return;
 	}
@@ -219,9 +225,19 @@ public class NpcEngine {
 			order.setOrderType(Order.OrderType.Magic );
 			order.setSpell(Spell.getSpell("Pick up resource"));
 			orders.add(order);
+			cards.add(Card.getCard(player.getLocation().getCard1()));
+			if (!player.getLocation().getCard2().equals(Card.CardType.Nothing)){
+				cards.add(Card.getCard(player.getLocation().getCard2()));
+			}
 			return true;
-		}
-		if (order.castable(cards).contains(Spell.getSpell("Move"))){
+		} else if (player.getLocation().getType().equals(Location.LocType.Mystical) &&
+				game.getMoversAtLocation(player.getLocation()).size() < 2){
+			order.setPlayer((Player)player);
+			order.setOrderType(Order.OrderType.Magic );
+			order.setSpell(Spell.getSpell("Create Golem"));
+			orders.add(order);
+			return true; 
+		} else if (order.castable(cards).contains(Spell.getSpell("Move"))){
 			orders.add(genMoveOrder(player, false,false));
 			removeCards(cards, Spell.getSpell("Move"));
 			return true;
@@ -258,6 +274,11 @@ public class NpcEngine {
 					continue;
 				}
 				if (moveTo.getCard1().equals(Card.CardType.Nothing) && 
+						loc2.getType().equals(Location.LocType.Mystical)){
+					moveTo = loc2;
+					continue;
+				}
+				if (moveTo.getCard1().equals(Card.CardType.Nothing) && 
 						!loc2.getCard1().equals(Card.CardType.Nothing)){
 					moveTo = loc2;
 					continue;
@@ -281,6 +302,7 @@ public class NpcEngine {
 			discardCardFromHand(cards, cardTypes[i]);
 		}
 	}
+	
 	
 	public void discardCardFromHand(List<Card>cards, Card.CardType type) {
 		Card drawn = null;

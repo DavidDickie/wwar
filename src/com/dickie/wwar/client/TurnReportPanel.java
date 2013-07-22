@@ -2,74 +2,101 @@ package com.dickie.wwar.client;
 
 import java.util.List;
 
+import com.dickie.wwar.shared.Player;
 import com.dickie.wwar.shared.PlayerMessage;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Button;
+import com.dickie.wwar.shared.Spell;
 import com.google.gwt.user.client.ui.DecoratorPanel;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class TurnReportPanel extends DecoratorPanel {
-	private static final VerticalPanel verticalPanel = new VerticalPanel();
-	private static final HTML panel = new HTML("Turn results");
-	private static final HorizontalPanel horizontalPanel = new HorizontalPanel();
-	private static final Button btnNewButton = new Button("Close");
-	private static final ScrollPanel scrollPanel = new ScrollPanel();
-	private static final DialogBox dialogBox2 = new DialogBox();
-	private static final TurnReportPanel trp = new TurnReportPanel();
-	private static  boolean initialized = false;
-	
-	
-	public TurnReportPanel() {
-		
-		setWidget(verticalPanel);
-		
-		verticalPanel.add(scrollPanel);
-		scrollPanel.setSize("600", "600");
-		scrollPanel.setWidget(panel);
-		panel.setSize("100%", "100%");
-		horizontalPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-		horizontalPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-		
-		verticalPanel.add(horizontalPanel);
-		horizontalPanel.setWidth("100%");
-		
-		horizontalPanel.add(btnNewButton);
-		
-	}
-	
-	private static void showMessages (List<PlayerMessage> msgs){
-		StringBuffer sb = new StringBuffer();
-		sb.append("<table><tr><td>");
-		for (PlayerMessage pm : msgs){
-			sb.append(pm.getMessage()).append("</td></tr>\n<tr><td>");
-		}
-		sb.append("------------END-----------</td></tr></table>");
-		panel.setHTML(sb.toString());
-	}
-	
-	public static void messageDialogBox(List<PlayerMessage> msgs){
-		showMessages(msgs);
-		btnNewButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				dialogBox2.hide();
-			}
-		});
 
-		dialogBox2.setText("Turn results");
-		dialogBox2.center();
-		if (!initialized){
-			initialized = true;
-			dialogBox2.add(trp);
+	public TurnReportPanel() {	
+	}
+	
+	public static void showMessages (List<PlayerMessage> msgs){
+		StringBuffer sb = new StringBuffer();
+		sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
+		sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+		sb.append("<head>");
+		sb.append("<meta content=\"en-us\" http-equiv=\"Content-Language\" />");
+		sb.append("<meta content=\"text/html; charset=windows-1252\" http-equiv=\"Content-Type\" />");
+		sb.append("<title>Untitled 1</title>");
+		sb.append("</head>");
+		sb.append("<body>");
+		sb.append("<table class=\"ms-color2-main\" style=\"width: 100%\">");
+		sb.append("	<!-- fpstyle: 9,011111100 -->");
+		sb.append("	<tr>");
+		sb.append("		<td class=\"ms-color2-tl\" style=\"width: 127px\">Player</td>");
+		sb.append("		<td class=\"ms-color2-top\">Order</td>");
+		sb.append("	</tr>");
+		for (PlayerMessage pm : msgs){
+			sb.append("	<tr><td class=\"auto-style1\" style=\"width: 127px\">");
+			sb.append(pm.getPlayerName()).append("</td><td class=\"ms-color2-even\">").append(pm.getMessage()).
+			append("</td></tr>\n");
 		}
-		btnNewButton.setEnabled(true);
-		btnNewButton.setFocus(true);
+		sb.append("</table>");
+		sb.append("</body>");
+		sb.append("</html>");
+		DisplayHtmlDialog.getInstance().display("Turn results", sb.toString());
+	}
+	
+	public static void showSpells(Player p){
+		StringBuffer sb = new StringBuffer();
+		sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
+		sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+		
+		sb.append("<head>");
+		sb.append("<meta content=\"en-us\" http-equiv=\"Content-Language\" />");
+		sb.append("<meta content=\"text/html; charset=windows-1252\" http-equiv=\"Content-Type\" />");
+		sb.append("<title>Untitled 1</title>");
+		
+		sb.append("</head>");
+		sb.append("");
+		sb.append("<body>");
+		sb.append("");
+		sb.append("<table class=\"ms-color2-main\" style=\"width: 100%\">");
+		sb.append("<!-- fpstyle: 9,011111100 -->");
+		sb.append("<tr>");
+		sb.append("<td class=\"ms-color2-tl\">Name</td>");
+		sb.append("<td class=\"ms-color2-top\">Description</td>");
+		sb.append("<td class=\"ms-color2-top\">Order</td>");
+		sb.append("<td class=\"ms-color2-top\">Start</td>");
+		sb.append("<td class=\"ms-color2-top\">Multiples</td>");
+		sb.append("<td class=\"ms-color2-top\">Type</td>");
+		sb.append("<td class=\"ms-color2-top\">Cards used (if spell)</td>");
+		sb.append("</tr>");
+		Spell[] spells = Spell.spells();
+		for (int i = 0; i < spells.length; i++){
+			boolean known = false;
+			sb.append("<tr>");
+			for (Spell ps : p.getKnownSpells()){
+				if (ps.name.equals(spells[i].name)){
+					known = true;
+					break;
+				}
+			}
+			if (known){
+				sb.append("<td class=\"auto-style1\">" + spells[i].name + "</td>");
+			} else {
+				sb.append("<td class=\"ms-color2-left\">" + spells[i].name + "</td>");
+			}
+			sb.append("<td class=\"ms-color2-even\">" + spells[i].getDescription() + "</td>");
+			sb.append("<td class=\"ms-color2-even\">" + spells[i].getSpellOrder() + "</td>");
+			sb.append("<td class=\"ms-color2-even\">" + spells[i].startSpell + "</td>");
+			sb.append("<td class=\"ms-color2-even\">" + spells[i].multiples + "</td>");
+			sb.append("<td class=\"ms-color2-even\">" + spells[i].affects + "</td>");
+			sb.append("<td class=\"ms-color2-even\">");
+			for (int y = 0; y < spells[i].cards.length; y++){
+				sb.append(spells[i].cards[y].toString()).append(" ");
+			}
+			sb.append("</td>");
+		}
+		sb.append("</td></tr></table></body></html>");
+		System.out.println();
+		DisplayHtmlDialog.getInstance().display("Orders", sb.toString());
+	}
+	
+	public static void showTurnOrders(List<PlayerMessage> msgs){
+		
 	}
 
 }

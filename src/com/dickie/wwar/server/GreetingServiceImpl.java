@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dickie.wwar.client.GreetingService;
-import com.dickie.wwar.shared.Connection;
-import com.dickie.wwar.shared.FieldVerifier;
 import com.dickie.wwar.shared.Game;
 import com.dickie.wwar.shared.Location;
 import com.dickie.wwar.shared.Order;

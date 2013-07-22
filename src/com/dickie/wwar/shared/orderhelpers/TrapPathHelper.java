@@ -2,7 +2,6 @@ package com.dickie.wwar.shared.orderhelpers;
 
 import com.dickie.wwar.shared.Connection;
 import com.dickie.wwar.shared.Game;
-import com.dickie.wwar.shared.Location;
 import com.dickie.wwar.shared.Order;
 import com.dickie.wwar.shared.OrderHelper;
 

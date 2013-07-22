@@ -3,15 +3,20 @@ package com.dickie.wwar.server;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import com.dickie.wwar.shared.*;
+import com.dickie.wwar.shared.Card;
+import com.dickie.wwar.shared.Connection;
+import com.dickie.wwar.shared.Game;
+import com.dickie.wwar.shared.Golum;
+import com.dickie.wwar.shared.Location;
+import com.dickie.wwar.shared.Player;
+import com.dickie.wwar.shared.PlayerMessage;
+import com.dickie.wwar.shared.Storable;
+import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 
@@ -24,19 +29,37 @@ public class DataStoreImpl {
 		// Use PreparedQuery interface to retrieve results
 		PreparedQuery pq = datastore.prepare(q);
 		for (Entity result : pq.asIterable()) {
-			names.add((String)result.getProperty("Name"));
+			String s = (String)result.getProperty("Name");
+			if (s.indexOf("_backup") > 0){
+				// it's a backup
+				continue;
+			}
+			names.add(s);
 		}
 		return names;
 	}
 	public void store(String gameName, List<Storable>items,String storeType){
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 		Key gameKey = getGameKey(gameName, datastore);
+		Key backupGameKey = getGameKey(gameName + "_backup", datastore);
 		// delete prior data
 		Query q = new Query(storeType).setAncestor(gameKey);
+		Query q2 = new Query(storeType).setAncestor(backupGameKey);
+		// delete the backup
+		PreparedQuery pq2 = datastore.prepare(q2);
+		for (Entity result : pq2.asIterable()) {
+		  datastore.delete(result.getKey());
+		}
 		// Use PreparedQuery interface to retrieve results
+		// store the old ones in the backup
 		PreparedQuery pq = datastore.prepare(q);
 		for (Entity result : pq.asIterable()) {
-		  datastore.delete(result.getKey());
+//			if (result.getProperty("name") != null){
+//				Key k = KeyFactory.createKey(backupGameKey,storeType, result.getProperty("name").toString());		
+//				Entity e = new Entity(storeType, k);
+//				datastore.put(e);
+//			}
+		    datastore.delete(result.getKey());
 		}
 		for (Storable s: items){
 			Key k = KeyFactory.createKey(gameKey,storeType, s.getName());		
@@ -56,7 +79,8 @@ public class DataStoreImpl {
 		// Use PreparedQuery interface to retrieve results
 		PreparedQuery pq = datastore.prepare(q);
 		for (Entity result : pq.asIterable()) {
-		  datastore.delete(result.getKey());
+			//System.out.println("Deleting " + result.toString());
+		    datastore.delete(result.getKey());
 		}
 	}
 	

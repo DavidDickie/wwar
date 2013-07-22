@@ -102,6 +102,11 @@ public class Order implements java.io.Serializable {
 	public Golum getDamageGolum() {
 		return damageGolum;
 	}
+	public Mover getDamageMover(){
+		if (damageGolum != null)
+			return damageGolum;
+		return damagePlayer;
+	}
 	public void setDamageGolum(Golum damageGolum) {
 		this.damageGolum = damageGolum;
 	}
@@ -185,10 +190,10 @@ public class Order implements java.io.Serializable {
 			response += " " + location.getName();
 			
 		} else if (spell.affects == 'P'){
-			if (getMover() != null){
-				response += getMover().getName();
+			if (getDamageMover() != null){
+				response += " " + this.getDamageMover();
 			} else {
-				response += " killed a bird sitting in the courtyard";
+				response += " no target";
 			}
 		}
 		return response;

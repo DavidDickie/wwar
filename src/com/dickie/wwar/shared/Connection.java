@@ -1,8 +1,6 @@
 package com.dickie.wwar.shared;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class Connection implements java.io.Serializable, Storable {
 	private static final long serialVersionUID = 1L;

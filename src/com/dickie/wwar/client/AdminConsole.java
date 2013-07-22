@@ -1,29 +1,25 @@
 package com.dickie.wwar.client;
 
-import java.util.List;
-
 import com.dickie.wwar.shared.Game;
 import com.dickie.wwar.shared.Player;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.HorizontalSplitPanel;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class AdminConsole extends DecoratorPanel {
 	private final VerticalPanel verticalPanel = new VerticalPanel();
@@ -131,6 +127,7 @@ public class AdminConsole extends DecoratorPanel {
 		
 		horizontalPanel_7.add(htmlNewHtml);
 		htmlNewHtml.setWidth("449px");
+		commitButton.setStyleName("button green medium");
 		horizontalPanel_7.add(commitButton);
 		commitButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
@@ -145,6 +142,7 @@ public class AdminConsole extends DecoratorPanel {
 			}
 		});
 		commitButton.setEnabled(false);
+		btnNewButton_1.setStyleName("button green medium");
 		btnNewButton_1.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				greetingService.saveGame(game.getName(), new AsyncCallback<Void>() {
@@ -167,6 +165,7 @@ public class AdminConsole extends DecoratorPanel {
 		horizontalPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		horizontalPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		horizontalPanel.setWidth("100%");
+		btnNewButton.setStyleName("button green medium");
 		
 		horizontalPanel.add(btnNewButton);
 		

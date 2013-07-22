@@ -1,6 +1,7 @@
 package com.dickie.wwar.shared;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Game implements java.io.Serializable {
@@ -58,6 +59,7 @@ public class Game implements java.io.Serializable {
 	private List<Order> instantOrders = new ArrayList<Order>();
 	
 	public List<PlayerMessage> getMessages() {
+		Collections.sort(messages);
 		return messages;
 	}
 	
@@ -88,6 +90,9 @@ public class Game implements java.io.Serializable {
 	public void addMessage(String toPlayer, String message, boolean allSee){
 		if (message.length() > 499){
 			throw new RuntimeException ("Message too long: " + message);
+		}
+		if (toPlayer == null){
+			throw new RuntimeException ("Message player not set: " + message);
 		}
 		PlayerMessage pm = new PlayerMessage();
 		pm.setPlayerName(toPlayer);
@@ -120,8 +125,7 @@ public class Game implements java.io.Serializable {
 				break;
 			}
 		}
-		players.remove(oldPlayer);
-		players.add(player);
+		oldPlayer.update(player);
 	}
 	
 	public void addLocation(Location loc){

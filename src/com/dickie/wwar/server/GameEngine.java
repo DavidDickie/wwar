@@ -60,6 +60,10 @@ public class GameEngine {
 		ls2 = (List<Storable>) ls;
 		dsi.store(game.getName(),  ls2, "Player");
 		
+		ls = game.getGolums();
+		ls2 = (List<Storable>) ls;
+		dsi.store(game.getName(),  ls2, "Golum");
+		
 		ls2 = new ArrayList<Storable>();
 		for (Player player : game.getPlayers()){
 			List<Card> lc = player.getHand();
@@ -76,10 +80,6 @@ public class GameEngine {
 			}
 		}
 		dsi.store(game.getName(), ls2, "Card");
-		
-		ls = game.getGolums();
-		ls2 = (List<Storable>)ls;
-		dsi.store(game.getName(), ls2, "Golum");
 	}
 	
 	public void readGame(String gameName){

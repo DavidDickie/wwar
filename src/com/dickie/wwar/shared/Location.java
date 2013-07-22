@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.dickie.wwar.shared.Card.CardType;
-import com.dickie.wwar.shared.Card.Where;
 
 public class Location implements java.io.Serializable, Storable {
 	private static final long serialVersionUID = 1L;

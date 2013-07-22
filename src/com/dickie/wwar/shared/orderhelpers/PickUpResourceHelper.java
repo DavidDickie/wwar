@@ -1,7 +1,5 @@
 package com.dickie.wwar.shared.orderhelpers;
 
-import java.util.Collections;
-
 import com.dickie.wwar.shared.Card;
 import com.dickie.wwar.shared.Game;
 import com.dickie.wwar.shared.Golum;

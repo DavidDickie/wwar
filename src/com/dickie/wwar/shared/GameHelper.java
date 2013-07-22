@@ -1,6 +1,11 @@
 package com.dickie.wwar.shared;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import com.dickie.wwar.shared.Location.LocType;
 
@@ -86,15 +91,18 @@ public class GameHelper {
 		}
 		
 		// create the map
-		Location centralCity = new Location(LocType.City, "Central", 0, 0);
+		int cityNameCount = 0;
+		Location centralCity = new Location(LocType.City, cityNames[cityNameCount++], 0, 0);
 		game.addLocation(centralCity);
 		ArrayList<Location> cities = new ArrayList<Location>();
 		ArrayList<Location> leftTowns = new ArrayList<Location>();
 		ArrayList<Location> rightTowns = new ArrayList<Location>();
 		ArrayList<Location> eleftTowns = new ArrayList<Location>();
 		ArrayList<Location> erightTowns = new ArrayList<Location>();
-		
-		
+		Collections.shuffle(townList);
+		int townNameCount = 0;
+		int mysticNameCount = 0;
+		int keepNameCount = 0;
 		
 		for (int i = 0; i < playerNames.length; i++){
 			int locCount = 0;
@@ -104,7 +112,7 @@ public class GameHelper {
 			
 			String pNum = "_" + i + "_";
 			
-			Location loc = new Location(LocType.City, "City" + pNum + i, xDist, 0);
+			Location loc = new Location(LocType.City, cityNames[cityNameCount++], xDist, 0);
 			game.addLocation(loc);
 			fixLoc.add(loc);
 			Connection conn = new Connection();
@@ -116,7 +124,7 @@ public class GameHelper {
 			
 			xDist = 4*scale;
 			
-			Location innerRightTown = new Location(LocType.Town, "Town" + pNum +locCount++, xDist, -2);
+			Location innerRightTown = new Location(LocType.Town, townList.get(townNameCount++), xDist, -2);
 			conn = new Connection();
 			conn.setStartLocation(loc);
 			conn.setEndLocation(innerRightTown);
@@ -125,7 +133,7 @@ public class GameHelper {
 			game.addConnection(conn);
 			leftTowns.add(innerRightTown);
 			
-			Location innerLeftTown = new Location(LocType.Town, "Town" + pNum +locCount++, xDist + 1*scale, 2);
+			Location innerLeftTown = new Location(LocType.Town, townList.get(townNameCount++), xDist + 1*scale, 2);
 			conn = new Connection();
 			conn.setStartLocation(loc);
 			conn.setEndLocation(innerLeftTown);
@@ -143,7 +151,7 @@ public class GameHelper {
 			
 			// upper
 			
-			loc = new Location(LocType.Town, "Town" + pNum +locCount++, xDist, 8);
+			loc = new Location(LocType.Town, townList.get(townNameCount++), xDist, 8);
 			conn = new Connection();
 			conn.setStartLocation(innerLeftTown);
 			conn.setEndLocation(loc);
@@ -152,7 +160,7 @@ public class GameHelper {
 			game.addConnection(conn);
 			erightTowns.add(loc);
 
-			Location innerKeepTown = new Location(LocType.Town, "Town" + pNum +locCount++, xDist + 1*scale, 3);
+			Location innerKeepTown = new Location(LocType.Town, townList.get(townNameCount++), xDist + 1*scale, 3);
 			conn = new Connection();
 			conn.setStartLocation(innerLeftTown);
 			conn.setEndLocation(innerKeepTown);
@@ -168,7 +176,7 @@ public class GameHelper {
 			
 			// lower
 			
-			Location outerKeepTown = new Location(LocType.Town, "Town" + pNum +locCount++, xDist, -3);
+			Location outerKeepTown = new Location(LocType.Town, townList.get(townNameCount++), xDist, -3);
 			conn = new Connection();
 			conn.setStartLocation(innerRightTown);
 			conn.setEndLocation(outerKeepTown);
@@ -176,7 +184,7 @@ public class GameHelper {
 			fixLoc.add(outerKeepTown);
 			game.addConnection(conn);
 		
-			loc = new Location(LocType.Town, "Town"+ pNum + locCount++, xDist-1*scale, -8);
+			loc = new Location(LocType.Town, townList.get(townNameCount++), xDist-1*scale, -8);
 			conn = new Connection();
 			conn.setStartLocation(innerRightTown);
 			conn.setEndLocation(loc);
@@ -192,7 +200,7 @@ public class GameHelper {
 			
 			xDist = 8*scale;
 			
-			Location keep = new Location (LocType.Keep, "Keep_" + i, xDist, 0);
+			Location keep = new Location (LocType.Keep, keepNames[keepNameCount++], xDist, 0);
 			game.addLocation(keep);
 			fixLoc.add(keep);
 			game.getPlayer(playerNames[i]).setLocation(keep);
@@ -266,7 +274,7 @@ public class GameHelper {
 			}
 			Location c3 = new Location(Location.LocType.Mystical, null, (c1.getX() + c2.getX())/2, (c1.getY() + c2.getY())/2);
 			game.addLocation(c3);
-			c3.setName("Mystical_"+i);
+			c3.setName(mysticNames[mysticNameCount++]);
 			Connection con = new Connection();
 			con.setStartLocation(c1);
 			con.setEndLocation(c3);
@@ -278,8 +286,197 @@ public class GameHelper {
 			
 		}
 		for (int i = 0;i < playerNames.length; i++){
-			game.addGolum(game.getPlayer(playerNames[i]), game.getLocation("Keep_"+i));
+			game.addGolum(game.getPlayer(playerNames[i]), game.getLocation(keepNames[i]));
 		}
 	}
+	
+	String[]cityNames={"Kragaford", "Myrmack", "Calindor", "Brensilihead", "Zerntani", "Oinmosland", "Fillish"};
+	String[]keepNames ={"Gwwerfern", "Myyrmalici","Ccryyne","Slynyy", "Illiiyi", "Hhrenthen", "Llybragy"};
+	String[]mysticNames={"Crystal Daves", "Magic Grotto", "Mount Doom", "Hidden Valley", "Stonehendge", "Ruined Temple"};
+	String[] townNames = {
+			"Belcoast",
+			"Appleville",
+			"BluebeachDowns",
+			"Zurgonipal",
+			"Brookmoor",
+			"Khuul",
+			"Butterice",
+			"Ashalmawia",
+			"Courtmarsh",
+			"Velothi",
+			"Crystalshadow",
+			"Kohgoruhn",
+			"CrystalwynIsland",
+			"Urshilaku",
+			"DeepmoorBarrens",
+			"Valenvelvar",
+			"Edgegate",
+			"Dagonfel",
+			"Eribank",
+			"Mora",
+			"Estercoast",
+			"Sandrith",
+			"FairburnPoint",
+			"Assarinibib",
+			"Freywall",
+			"Erabenimsun",
+			"Highdale",
+			"Holamayn",
+			"Highmeadow",
+			"Branora",
+			"IronvilleCrossing",
+			"Telasero",
+			"Jancastle",
+			"Ebonheart",
+			"Janlyn",
+			"AldSotha",
+			"Landpond",
+			"Vivec",
+			"Linland",
+			"Seyda",
+			"Linmeadow",
+			"Odar",
+			"Lochhurst",
+			"Uvirith",
+			"Lorbeach",
+			"Falensarano",
+			"Mageland",
+			"Zaina",
+			"Mallowcoast",
+			"Nuchuleft",
+			"Maplebarrow",
+			"Moonmoth",
+			"Mapleport",
+			"Balmora",
+			"Marbleton",
+			"Hlormaren",
+			"MarblewolfShore",
+			"Gnarr",
+			"Meadowlake",
+			"Khartag",
+			"NewlakeIsland",
+			"Andrasreth",
+			"NewvioletPond",
+			"Ginisis",
+			"Prymarsh",
+			"Berandes",
+			"Riverlake",
+			"Koal",
+			"Roseglass",
+			"BulIsra",
+			"Rosewall",
+			"MarrGan",
+			"ShadowmoorDowns",
+			"Vemynal",
+			"SilverbutterShore",
+			"Tureynulal",
+			"Southfalcon",
+			"Volmoria",
+			"StarryoakBarrow",
+			"Suron",
+			"Stoneby",
+			"Suran",
+			"Strongby",
+			"Odrosal",
+			"Swynborough",
+			"Caldera",
+			"Westertown",
+			"AldRuhn",
+			"Wildebush",
+			"Buckmoth",
+			"Winterbarrow",
+			"Wintercliff",
+			"Wolfkeed",
+			"Woodbush",
+			"Aldcliff",
+			"Aldmead",
+			"Barrowwald",
+			"Bayfield",
+			"Clifflake",
+			"Coldshadow",
+			"Deepcrest",
+			"DeephallPoint",
+			"DeepspellLake",
+			"Dellgate",
+			"Dorhaven",
+			"Dragonmarsh",
+			"FallashBridge",
+			"Fallville",
+			"Fayfair",
+			"Glasscliff",
+			"Glasscliff",
+			"GreendellBarrens",
+			"Greymarsh",
+			"Icebarrow",
+			"Lintown",
+			"MallowbrookHedge",
+			"Maplehurst",
+			"Merribourne",
+			"Norbank",
+			"Northhollow",
+			"Oldcastle",
+			"OldtonIsland",
+			"Orness",
+			"Orwald",
+			"Prywyn",
+			"Redcliff",
+			"Riverton",
+			"Seamarsh",
+			"Shadowdale",
+			"ShadowpondPoint",
+			"Summermarsh",
+			"Valacre",
+			"Valwick",
+			"VertmountDowns",
+			"Watercoast",
+			"WellbeachField",
+			"Westbay",
+			"Westervale",
+			"Wheatland",
+			"Whiteedge",
+			"Whitehollow",
+			"Whitepine",
+			"Wildefort",
+			"WinterfallMill",
+			"Aelwynne",
+			"Aldmaple",
+			"Ashbush",
+			"Bluebeach",
+			"ButterboroughPoint",
+			"ClearhamDowns",
+			"Clifffield",
+			"Coldrose",
+			"Coldshore",
+			"Easthaven",
+			"Fairmeadow",
+			"Falconlake",
+			"Fallhedge",
+			"Faycastle",
+			"Goldlyn",
+			"Greendell",
+			"GreywaterEdge",
+			"Icefay",
+			"Lochfort",
+			"Marbledragon",
+			"Marblemoor",
+			"Marblepond",
+			"Marbleport",
+			"Morcrest",
+			"Oakborough",
+			"Oldshade",
+			"Raypond",
+			"Riveredge",
+			"Riverhaven",
+			"RosesageBush",
+			"Seafort",
+			"SilverpondCrags",
+			"Snowland",
+			"Springfield",
+			"Starrycastle",
+			"Starrycastle",
+			"StonecliffForest",
+			"StrongwheatCliff"};
+	List<String> townList = Arrays.asList(townNames);
+	
 	
 }

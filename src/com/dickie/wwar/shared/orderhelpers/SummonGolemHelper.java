@@ -12,6 +12,12 @@ public class SummonGolemHelper implements OrderHelper,java.io.Serializable {
 
 	@Override
 	public String executeOrder(Game game, boolean server, Order order) {
+		if (order.getMover() instanceof Golum){
+			if (server){
+				game.addMessage(order.getMover().getOwnerName(),"Spell fail: Only a wizard can create a Golem", true);
+			}
+			return "Only a wizard can create a Golem";
+		}
 		Player player = game.getPlayer(order.getOwnerName());
 		Location loc1 = game.getLocation(order.getMover().getLocation().getName());
 		Golum golum = new Golum();
@@ -19,7 +25,9 @@ public class SummonGolemHelper implements OrderHelper,java.io.Serializable {
 		golum.setOwner(player);
 		golum.setLocation(loc1);
 		game.getGolums().add(golum);
-		game.addMessage(order.getMover().getOwnerName(), " created Golem " + golum.toString(), true);
+		if (server){
+			game.addMessage(order.getMover().getOwnerName(), " created Golem " + golum.toString(), true);
+		}
 		return null;
 	}
 

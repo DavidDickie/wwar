@@ -1,13 +1,11 @@
 package com.dickie.wwar.client;
 
-import java.util.List;
-
 import org.vaadin.gwtgraphics.client.DrawingArea;
+import org.vaadin.gwtgraphics.client.Image;
 import org.vaadin.gwtgraphics.client.Line;
 import org.vaadin.gwtgraphics.client.shape.Circle;
 import org.vaadin.gwtgraphics.client.shape.Rectangle;
 import org.vaadin.gwtgraphics.client.shape.Text;
-import org.vaadin.gwtgraphics.client.Image;
 
 import com.dickie.wwar.shared.Game;
 import com.dickie.wwar.shared.Golum;

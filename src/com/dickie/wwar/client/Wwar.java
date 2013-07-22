@@ -10,11 +10,12 @@ import com.dickie.wwar.shared.Golum;
 import com.dickie.wwar.shared.Location;
 import com.dickie.wwar.shared.Mover;
 import com.dickie.wwar.shared.Order;
-import com.dickie.wwar.shared.Spell;
 import com.dickie.wwar.shared.OrderEngine;
 import com.dickie.wwar.shared.Player;
+import com.dickie.wwar.shared.Spell;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -30,17 +31,15 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.dom.client.Style.Cursor;
-import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.TextBoxBase;
 import com.google.gwt.user.client.ui.ValueBoxBase.TextAlignment;
-import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -53,6 +52,7 @@ public class Wwar implements EntryPoint {
 	public static boolean editMode;
 	private static Location lastLocation = null;
 	private ArrayList<String> redraw = new ArrayList<String>();
+	private DisplayHtmlDialog popupDialog = DisplayHtmlDialog.getInstance();
 
 	/**
 	 * Create a remote service proxy to talk to the server-side Greeting
@@ -61,7 +61,7 @@ public class Wwar implements EntryPoint {
 	private final GreetingServiceAsync greetingService = GWT
 			.create(GreetingService.class);
 	private final MapPanel mapPanel = new MapPanel();
-	final DialogBox dialogBox = new DialogBox();
+
 	final Button closeButton = new Button("Close");
 	final Label textToServerLabel = new Label();
 	final HTML serverResponseLabel = new HTML();
@@ -90,15 +90,15 @@ public class Wwar implements EntryPoint {
 	private final ListBox golemListBox = new ListBox();
 	private final ListBox spellComboBox = new ListBox();
 	private final Button btnExecute = new Button("Execute");
-
+	private final ListBox playerNameComboBox = new ListBox();
 	private Player activePlayer = null;
 	private final HorizontalPanel horizontalPanel_1 = new HorizontalPanel();
 	private final Button btnRedraw = new Button("Draw");
 	private final TextBox passthroughTextBox = new TextBox();
-	private final Label lblAvailableRedraws = new Label("Available draws:");
+	private final Label lblAvailableRedraws = new Label("Available:");
 	private final HorizontalPanel horizontalPanel_2 = new HorizontalPanel();
 	private final TextArea locTextArea = new TextArea();
-	
+
 	public MapPanel getMapPanel() {
 		return mapPanel;
 	}
@@ -116,23 +116,20 @@ public class Wwar implements EntryPoint {
 
 		rootPanel.add(horizontalPanel);
 		horizontalPanel.setSize("1024", "800");
+		verticalPanel
+				.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		verticalPanel.setBorderWidth(4);
 		horizontalPanel.add(verticalPanel);
-		verticalPanel.setWidth("100%");
+		verticalPanel.setSize("100%", "100%");
 		verticalPanel.add(decoratorPanel_1);
 		decoratorPanel_1.setWidth("100%");
 		decoratorPanel_1.setWidget(verticalPanel_1);
 		verticalPanel_1.setWidth("100%");
 
 		verticalPanel_1.add(lblNewLabel_2);
-		gameNameTextBox.setAlignment(TextAlignment.CENTER);
-		gameNameTextBox.setTextAlignment(TextBoxBase.ALIGN_LEFT);
-		gameNameTextBox.setText("demo");
 
-		verticalPanel_1.add(gameNameTextBox);
-		verticalPanel_1.setCellVerticalAlignment(gameNameTextBox,
-				HasVerticalAlignment.ALIGN_MIDDLE);
-		gameNameTextBox.setSize("180px", "10px");
+		verticalPanel_1.add(playerNameComboBox);
+		playerNameComboBox.setWidth("100%");
 		verticalPanel_1.add(lblPlayername);
 
 		verticalPanel_1.add(playerNameTextBox);
@@ -142,11 +139,7 @@ public class Wwar implements EntryPoint {
 		passwordTextBox.addKeyPressHandler(new KeyPressHandler() {
 			public void onKeyPress(KeyPressEvent event) {
 				if (event.getCharCode() == KeyCodes.KEY_ENTER) {
-					if (passwordTextBox.getText().equals("Edit-me")) {
-						editMode = true;
-						return;
-					}
-					editMode = false;
+					getGame();
 					setActivePlayer(playerNameTextBox.getText(),
 							passwordTextBox.getText());
 				}
@@ -168,6 +161,7 @@ public class Wwar implements EntryPoint {
 		verticalPanel_2.setSize("100%", "296px");
 
 		verticalPanel_2.add(lblYourHand);
+		handListBox.setMultipleSelect(true);
 		verticalPanel_2.add(handListBox);
 		handListBox.setWidth("100%");
 		handListBox.setVisibleItemCount(5);
@@ -175,12 +169,14 @@ public class Wwar implements EntryPoint {
 				.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 
 		verticalPanel_2.add(horizontalPanel_1);
+		horizontalPanel_1.setWidth("100%");
 
 		horizontalPanel_1.add(lblAvailableRedraws);
-		lblAvailableRedraws.setWidth("97px");
+		lblAvailableRedraws.setWidth("67px");
 
 		horizontalPanel_1.add(passthroughTextBox);
 		passthroughTextBox.setSize("40px", "13px");
+		btnRedraw.setStyleName("button gray medium");
 		btnRedraw.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				if (activePlayer.getPassthrough() == 0) {
@@ -204,7 +200,8 @@ public class Wwar implements EntryPoint {
 
 		horizontalPanel_1.add(btnRedraw);
 		btnRedraw.setHeight("26px");
-		horizontalPanel_4.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		horizontalPanel_4
+				.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		verticalPanel_2.add(horizontalPanel_4);
 		horizontalPanel_4.add(lblGold);
 		horizontalPanel_4.add(goldIntegerBox);
@@ -235,21 +232,14 @@ public class Wwar implements EntryPoint {
 		verticalPanel_3.add(golemListBox);
 		golemListBox.setVisibleItemCount(5);
 		golemListBox.setSize("100%", "60px");
-		horizontalPanel_3
-				.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-
-		verticalPanel_3.add(horizontalPanel_3);
-		horizontalPanel_3.setWidth("100%");
-		horizontalPanel_3.add(btnExecute);
+		verticalPanel_3.add(btnExecute);
+		btnExecute.setStyleName("button pink medium");
 		btnExecute.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				doOrders();
 			}
 		});
 		btnExecute.setWidth("100%");
-
-		horizontalPanel_3.add(lblNewLabel_1);
-		lblNewLabel_1.setWidth("100%");
 
 		verticalPanel.add(decoratorPanel_4);
 		decoratorPanel_4.setWidth("100%");
@@ -259,6 +249,7 @@ public class Wwar implements EntryPoint {
 
 		verticalPanel_4.add(horizontalPanel_2);
 		horizontalPanel_2.setWidth("100%");
+		btnFinishTurn.setStyleName("button blue medium");
 		horizontalPanel_2.add(btnFinishTurn);
 		btnFinishTurn.setWidth("100%");
 
@@ -270,37 +261,49 @@ public class Wwar implements EntryPoint {
 			}
 		});
 		btnFinishTurn.setText("Finish Turn");
-		
-		
+
 		verticalPanel.add(locTextArea);
-		locTextArea.setWidth("100%");
+		locTextArea.setWidth("195px");
+		horizontalPanel_5
+				.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
 		verticalPanel.add(horizontalPanel_5);
 		horizontalPanel_5.setWidth("100%");
+		btnPlayers.setStyleName("button white medium");
 		btnPlayers.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				StringBuffer sb = new StringBuffer();
 				sb.append("<table><tr><td>Player</td><td>Spells</td><td>Cards</td><td>Towns</td><td>Total</td></tr>");
-				for (Player pl : game.getPlayers()){
+				for (Player pl : game.getPlayers()) {
 					int towns = 0;
-					for (Location loc: game.getLocations()){
-						if (loc.isLocked()){
-							if (loc.getLockedBy().equals(pl.getName())){
+					for (Location loc : game.getLocations()) {
+						if (loc.isLocked()) {
+							if (loc.getLockedBy().equals(pl.getName())) {
 								towns++;
 							}
 						} else {
 							List<Mover> ms = game.getMoversAtLocation(loc);
-							if (ms.size() > 0 && ms.get(0).getOwnerName().equals(pl.getName())){
+							if (ms.size() > 0
+									&& ms.get(0).getOwnerName()
+											.equals(pl.getName())) {
 								towns++;
 							}
 						}
 					}
-					int numCards = pl.getHand().size() + pl.getDrawPile().size() + pl.getDiscardPile().size();
-					sb.append("<tr><td>").append(pl.getName()).append("</td><td>").
-							append(pl.getKnownSpells().size()).append("</td><td>").
-							append(numCards).append("</td><td>").
-							append(towns).append("</td><td>"). 
-							append(numCards + pl.getKnownSpells().size()*2 + towns*3).append("</td></tr>");
+					int numCards = pl.getHand().size()
+							+ pl.getDrawPile().size()
+							+ pl.getDiscardPile().size();
+					sb.append("<tr><td>")
+							.append(pl.getName())
+							.append("</td><td>")
+							.append(pl.getKnownSpells().size())
+							.append("</td><td>")
+							.append(numCards)
+							.append("</td><td>")
+							.append(towns)
+							.append("</td><td>")
+							.append(numCards + pl.getKnownSpells().size() * 2
+									+ towns * 3).append("</td></tr>");
 				}
 				sb.append("</table>");
 				displayMessage(sb.toString());
@@ -308,14 +311,32 @@ public class Wwar implements EntryPoint {
 		});
 
 		horizontalPanel_5.add(btnPlayers);
-		btnPlayers.setHeight("30");
-		btnResults.addClickHandler(new ClickHandler() {
+		btnPlayers.setSize("55", "");
+
+		Button spellBtn = new Button("Spells");
+		spellBtn.setStyleName("button white medium");
+		spellBtn.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				TurnReportPanel.messageDialogBox(game.getMessages());
+				TurnReportPanel.showSpells(activePlayer);
 			}
 		});
-
 		horizontalPanel_5.add(btnResults);
+		btnResults.setStyleName("button white medium");
+		btnResults.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				TurnReportPanel.showMessages(game.getMessages());
+			}
+		});
+		btnResults.setWidth("55");
+		horizontalPanel_5.add(spellBtn);
+		spellBtn.setWidth("55");
+		horizontalPanel_6
+				.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+
+		verticalPanel.add(horizontalPanel_6);
+		horizontalPanel_6.setWidth("100%");
+		btnAdmin.setStyleName("button white medium");
+		horizontalPanel_6.add(btnAdmin);
 		btnAdmin.setEnabled(false);
 		btnAdmin.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
@@ -332,11 +353,12 @@ public class Wwar implements EntryPoint {
 						acDialogBox.hide();
 					}
 				});
-				gameNameTextBox.setText(game.getName());
+
 			}
 		});
-
-		horizontalPanel_5.add(btnAdmin);
+		initGameSelection();
+		
+		btnAdmin.setWidth("55");
 
 		horizontalPanel.add(decoratorPanel);
 		decoratorPanel.setWidget(mapPanel);
@@ -347,6 +369,7 @@ public class Wwar implements EntryPoint {
 					if (lastLocation == null) {
 						lblYouAreNot
 								.setText("Name in Playername, click new location");
+
 						getLocation((event.getX() - mapPanel.getCenter())
 								/ mapPanel.getScale(),
 								(event.getY() - mapPanel.getCenter())
@@ -360,6 +383,7 @@ public class Wwar implements EntryPoint {
 								/ mapPanel.getScale());
 						updateLocation(lastLocation.getName(), newLoc);
 						lastLocation = null;
+
 					}
 				} else if (locationSelect) {
 					if (game == null)
@@ -415,50 +439,29 @@ public class Wwar implements EntryPoint {
 
 		});
 
-		// Create the popup dialog box
+	}
 
-		dialogBox.setText("Remote Procedure Call");
-		dialogBox.setAnimationEnabled(true);
-
-		// We can set the id of a widget by accessing its Element
-		closeButton.getElement().setId("closeButton");
-
-		VerticalPanel dialogVPanel = new VerticalPanel();
-		dialogVPanel.addStyleName("dialogVPanel");
-		dialogVPanel.add(new HTML("<br><b>Response:</b>"));
-		dialogVPanel.add(serverResponseLabel);
-		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-		dialogVPanel.add(closeButton);
-		dialogBox.setWidget(dialogVPanel);
-
-		// Add a handler to close the DialogBox
-		closeButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				dialogBox.hide();
-				// sendButton.setEnabled(true);
-				// sendButton.setFocus(true);
-			}
-		});
-		greetingService.greetServer(gameNameTextBox.getText(), new AsyncCallback<String>() {
+	private void initGameSelection() {
+		greetingService.greetServer("", new AsyncCallback<String>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
-				// Show the RPC error message to the user
-				dialogBox.setText("Failure");
-				serverResponseLabel.addStyleName("serverResponseLabelError");
-				serverResponseLabel.setHTML(caught.getMessage());
-				dialogBox.center();
-				closeButton.setFocus(true);
-
+				popupDialog.display("Error on server",
+						caught.getMessage());
+				
 			}
 
 			@Override
 			public void onSuccess(String result) {
-				getGame();
+				String[] games = result.split(";");
+				for (int i = 0; i < games.length; i++){
+					playerNameComboBox.addItem(games[i]);
+				}
+				
 			}
-
+			
 		});
-
+		
 	}
 
 	private void getData(String player, int x, int y) {
@@ -469,29 +472,32 @@ public class Wwar implements EntryPoint {
 	private OrderEngine oe = null;
 
 	private void getGame() {
-		greetingService.getGame(gameNameTextBox.getText(), new AsyncCallback<Game>() {
-			public void onFailure(Throwable caught) {
-				// Show the RPC error message to the user
-				dialogBox.setText("Failure");
-				serverResponseLabel.addStyleName("serverResponseLabelError");
-				serverResponseLabel.setHTML("bad shit");
-				dialogBox.center();
-				closeButton.setFocus(true);
-			}
+		greetingService.getGame(playerNameComboBox
+				.getItemText(playerNameComboBox.getSelectedIndex()),
+				new AsyncCallback<Game>() {
+					public void onFailure(Throwable caught) {
+						popupDialog.display("Error on server",
+								caught.getMessage());
 
-			@Override
-			public void onSuccess(Game result) {
-				btnAdmin.setEnabled(true);
-				game = result;
-				oe = new OrderEngine();
-				oe.setGame(game);
-				if (activePlayer != null) {
-					setActivePlayer(activePlayer.getName(),
-							activePlayer.getPassword());
-				}
-				TurnReportPanel.messageDialogBox(game.getMessages());
-			}
-		});
+					}
+
+					@Override
+					public void onSuccess(Game result) {
+						btnAdmin.setEnabled(true);
+						game = result;
+						oe = new OrderEngine();
+						oe.setGame(game);
+						if (activePlayer != null) {
+							setActivePlayer(activePlayer.getName(),
+									activePlayer.getPassword());
+						} else if (playerNameTextBox.getText() != null
+								&& !playerNameTextBox.getText().equals("")) {
+							setActivePlayer(playerNameTextBox.getText(),
+									passwordTextBox.getText());
+						}
+						TurnReportPanel.showMessages(game.getMessages());
+					}
+				});
 
 	}
 
@@ -521,37 +527,39 @@ public class Wwar implements EntryPoint {
 	}
 
 	private void getLocation(int x, int y) {
-		greetingService.getLocation(gameNameTextBox.getText(), x, y,
+		greetingService.getLocation(playerNameComboBox
+				.getItemText(playerNameComboBox.getSelectedIndex()), x, y,
 				new AsyncCallback<Location>() {
 					public void onFailure(Throwable caught) {
-						// Show the RPC error message to the user
-						dialogBox.setText("Failure");
-						dialogBox.center();
-						closeButton.setFocus(true);
+						popupDialog.display("Error on server",
+								caught.getMessage());
 					}
 
 					@Override
 					public void onSuccess(Location result) {
 						lastLocation = result;
+						playerNameTextBox.setText(lastLocation.getName());
 					}
 				});
 	}
 
-	private void updateLocation(String oldLocName, Location newLoc) {
-		greetingService.editLocation(gameNameTextBox.getText(), oldLocName, newLoc,
-				new AsyncCallback<Void>() {
+	private void updateLocation(final String oldLocName, final Location newLoc) {
+		greetingService.editLocation(playerNameComboBox
+				.getItemText(playerNameComboBox.getSelectedIndex()),
+				oldLocName, newLoc, new AsyncCallback<Void>() {
 					public void onFailure(Throwable caught) {
-						// Show the RPC error message to the user
-						dialogBox.setText("Failure");
-						dialogBox.center();
-						closeButton.setFocus(true);
+						popupDialog.display("Error on server",
+								caught.getMessage());
 					}
 
 					@Override
 					public void onSuccess(Void v) {
 						mapPanel.canvas.clear();
-						mapPanel.initialized=false;
-						getGame();
+						mapPanel.initialized = false;
+						Location l = game.getLocation(oldLocName);
+						l.setName(newLoc.getName());
+						l.setX(newLoc.getX());
+						l.setY(newLoc.getY());
 						drawMap();
 					}
 				});
@@ -561,11 +569,8 @@ public class Wwar implements EntryPoint {
 
 	private void doOrders() {
 		if (activePlayer == null) {
-			dialogBox.setText("Failure");
-			serverResponseLabel.addStyleName("serverResponseLabelError");
-			serverResponseLabel.setHTML("<b>you have not logged in yet</b>");
-			dialogBox.center();
-			closeButton.setFocus(true);
+			popupDialog.display("Yo, dumbass",
+					"<b>you have not logged in yet</b>");
 			return;
 		}
 		btnRedraw.setEnabled(false);
@@ -574,9 +579,8 @@ public class Wwar implements EntryPoint {
 			this.displayMessage("Select someone first");
 			return;
 		}
-		String name = golemListBox
-				.getItemText(golemListBox.getSelectedIndex());
-		if (name.indexOf("[") > -1){
+		String name = golemListBox.getItemText(golemListBox.getSelectedIndex());
+		if (name.indexOf("[") > -1) {
 			orderInProgress.setGolum(game.getGolum(name));
 		} else {
 			orderInProgress.setPlayer(activePlayer);
@@ -596,13 +600,35 @@ public class Wwar implements EntryPoint {
 		} else if (spell.affects == 'S') {
 			if (orderInProgress.getSpell().name.equals("Buy Spell")) {
 				buySpell();
-			} else if (orderInProgress.getSpell().name.equals("Discard")){
-				if (handListBox.getSelectedIndex() < 0){
+			} else if (orderInProgress.getSpell().name.equals("Discard")) {
+				if (handListBox.getSelectedIndex() < 0) {
 					this.displayMessage("Select a card to discard first");
 					return;
+
 				}
-				orderInProgress.setCardType(Card.CardType.valueOf(handListBox.getItemText(
-						handListBox.getSelectedIndex())));
+				// ADD THIS CHANGE
+				ArrayList<String> disCards = new ArrayList<String>();
+				for (int i = 0, l = handListBox.getItemCount(); i < l; i++) {
+					if (handListBox.isItemSelected(i)) {
+						disCards.add(handListBox.getItemText(i));
+					}
+				}
+				for (String s : disCards) {
+					Order order = new Order();
+					order.setPlayer(activePlayer);
+					order.setSpell(orderInProgress.getSpell());
+					order.setCardType(Card.CardType.valueOf(s));
+					orderInProgress = order;
+					executeSpell();
+				}
+				// ADD THIS CHANGE
+			} else if (orderInProgress.getSpell().name.equals("Trade")) {
+				if (handListBox.getSelectedIndex() < 0) {
+					this.displayMessage("Select a card to trade first");
+					return;
+				}
+				orderInProgress.setCardType(Card.CardType.valueOf(handListBox
+						.getItemText(handListBox.getSelectedIndex())));
 				executeSpell();
 			} else {
 				executeSpell();
@@ -613,34 +639,25 @@ public class Wwar implements EntryPoint {
 	}
 
 	private void sendOrder(List<Order> orders) {
-		greetingService.doOrders(gameNameTextBox.getText(), activePlayer.getName(), orders,
-				new AsyncCallback<Boolean>() {
+		greetingService.doOrders(playerNameComboBox
+				.getItemText(playerNameComboBox.getSelectedIndex()),
+				activePlayer.getName(), orders, new AsyncCallback<Boolean>() {
 					public void onFailure(Throwable caught) {
-						// Show the RPC error message to the user
-						dialogBox.setText("Remote Procedure Call - Failure");
-						serverResponseLabel
-								.addStyleName("serverResponseLabelError");
-						serverResponseLabel.setHTML(caught.getMessage());
-						dialogBox.center();
-						closeButton.setFocus(true);
+						popupDialog.display("Error on server",
+								caught.getMessage());
 					}
 
 					@Override
 					public void onSuccess(Boolean result) {
-						dialogBox.setText("Orders processed");
-						serverResponseLabel
-								.addStyleName("serverResponseLabelError");
 						if (result.booleanValue()) {
-							serverResponseLabel
-									.setHTML("<b>Orders accepted; turn ran</b>");
+							popupDialog.display("Orders processed",
+									"<b>Orders accepted; turn ran</b>");
 							getGame();
 						} else {
-							serverResponseLabel
-									.setHTML("<b>Orders accepted</b>");
+							popupDialog.display("Orders processed",
+									"<b>Orders accepted</b>");
 						}
-
-						dialogBox.center();
-						closeButton.setFocus(true);
+						;
 						oe.clearSingletons();
 					}
 				});
@@ -651,17 +668,12 @@ public class Wwar implements EntryPoint {
 		activePlayer = game.getPlayer(player);
 		if (activePlayer == null
 				|| !activePlayer.getPassword().equals(password)) {
-
-			dialogBox.setText("Error");
-			serverResponseLabel.addStyleName("serverResponseLabelError");
 			if (activePlayer == null) {
-				serverResponseLabel.setHTML("Bad playername");
+				popupDialog.display("Error", "Bad playername");
 			} else {
 				activePlayer = null;
-				serverResponseLabel.setHTML("Bad password");
+				popupDialog.display("Error", "Bad password");
 			}
-			dialogBox.center();
-			closeButton.setFocus(true);
 			return;
 		}
 		lblYouAreNot.setText("You are logged in");
@@ -683,7 +695,7 @@ public class Wwar implements EntryPoint {
 		for (Spell spell : order.castable(activePlayer.getHand())) {
 			if (spell.isInvisible()) {
 				continue;
-			} 
+			}
 			if (spell.startSpell
 					|| activePlayer.getKnownSpells().contains(spell)) {
 
@@ -717,18 +729,11 @@ public class Wwar implements EntryPoint {
 	}
 
 	public void displayMessage(String message) {
-		dialogBox.setText("Notification");
-		serverResponseLabel.addStyleName("serverResponseLabelError");
-		serverResponseLabel.setHTML(message);
-		serverResponseLabel.setWidth("200px");
-		dialogBox.center();
-		closeButton.setFocus(true);
+		popupDialog.display("Notification", message);
 	}
 
 	private ArrayList<Order> queuedOrders = new ArrayList<Order>();
-	private final HorizontalPanel horizontalPanel_3 = new HorizontalPanel();
-	private final Button btnFinishTurn = new Button("New button");
-	private final Label lblNewLabel_1 = new Label("                ");
+	private final Button btnFinishTurn = new Button("Finish Turn");
 	private final HorizontalPanel horizontalPanel_4 = new HorizontalPanel();
 	private final Label lblGold = new Label("Gold: ");
 	private final IntegerBox goldIntegerBox = new IntegerBox();
@@ -740,7 +745,7 @@ public class Wwar implements EntryPoint {
 	private final Button btnAdmin = new Button("Admin");
 	private final Button btnResults = new Button("Results");
 	private final Label lblNewLabel_2 = new Label("Game:");
-	private final TextBox gameNameTextBox = new TextBox();
+	private final HorizontalPanel horizontalPanel_6 = new HorizontalPanel();
 
 	public void executeSpell() {
 
@@ -793,23 +798,27 @@ public class Wwar implements EntryPoint {
 		if (target) {
 
 			dialogVPanel.add(targetComboBox);
-			Location loc = activePlayer.getLocation();
-			for (Player player : game.getPlayers()) {
-				if (player.equals(activePlayer)) {
-					continue;
+			// ADD THIS CHANGE
+			Location loc = orderInProgress.getMover().getLocation();
+			for (Location l : game.getConnectedLocations(loc)) {
+				for (Player player : game.getPlayers()) {
+					if (player.equals(activePlayer)) {
+						continue;
+					}
+					if (player.getLocation().equals(l)) {
+						targetComboBox.addItem(player.getName());
+					}
 				}
-				if (player.getLocation().equals(loc)) {
-					targetComboBox.addItem(player.getName());
+				for (Golum gol : game.getGolums()) {
+					if (gol.getOwner().equals(activePlayer)) {
+						continue;
+					}
+					if (gol.getLocation().equals(l)) {
+						targetComboBox.addItem(gol.toString());
+					}
 				}
 			}
-			for (Golum gol : game.getGolums()) {
-				if (gol.getOwner().equals(activePlayer)) {
-					continue;
-				}
-				if (gol.getLocation().equals(loc)) {
-					targetComboBox.addItem(gol.toString());
-				}
-			}
+
 		}
 		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
 		HorizontalPanel dialogHPanel = new HorizontalPanel();
