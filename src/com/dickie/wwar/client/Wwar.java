@@ -449,6 +449,9 @@ public class Wwar implements EntryPoint {
 						game = result;
 						oe = new OrderEngine();
 						oe.setGame(game);
+						for (Golum g : game.getGolums()){
+							game.getLocation(g.getLocation()).setStartedWithAGolum(true);
+						}
 						if (activePlayer != null) {
 							setActivePlayer(activePlayer.getName(),
 									activePlayer.getPassword());
@@ -660,7 +663,8 @@ public class Wwar implements EntryPoint {
 			} 
 			if (spell.name.equals("Create Golem")){
 				if (!activePlayer.getLocation().getType().equals(Location.LocType.Mystical) ||
-				!containsTwoMana(activePlayer.getHand())){
+				!containsTwoMana(activePlayer.getHand()) ||
+				activePlayer.getLocation().isStartedWithAGolum()){
 					continue;
 				}				
 			}

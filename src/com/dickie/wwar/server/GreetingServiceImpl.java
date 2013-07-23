@@ -53,7 +53,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 			createNewGame("demo");
 		}
 		for (GameEngine ge: gameEngines){
-			games += games + ge.getGame().getName()+ ";";
+			games += ge.getGame().getName()+ ";";
 		}
 		return games;
 	}

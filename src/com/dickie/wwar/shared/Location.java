@@ -102,7 +102,16 @@ public class Location implements java.io.Serializable, Storable {
 	private List<String> visibleTo = new ArrayList<String>();
 	private List<String> hasCrony = new ArrayList<String>();
 	private boolean changed; 
+	private boolean startedWithAGolum = false;
 	
+	public boolean isStartedWithAGolum() {
+		return startedWithAGolum;
+	}
+
+	public void setStartedWithAGolum(boolean startedWithAGolum) {
+		this.startedWithAGolum = startedWithAGolum;
+	}
+
 	public HashMap<String, Object> getProps(){
 		HashMap<String, Object> hm = new HashMap<String, Object>();
 		hm.put("name", name);

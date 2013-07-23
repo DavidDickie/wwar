@@ -2,6 +2,7 @@ package com.dickie.wwar.client;
 
 import java.util.List;
 
+import com.dickie.wwar.shared.Card;
 import com.dickie.wwar.shared.Game;
 import com.dickie.wwar.shared.Location;
 import com.dickie.wwar.shared.Mover;
@@ -24,7 +25,8 @@ public class TurnReportPanel extends DecoratorPanel {
 		sb.append("<td class=\"ms-color2-top\">Spells</td>");
 		sb.append("<td class=\"ms-color2-top\">Cards</td>");
 		sb.append("<td class=\"ms-color2-top\">Towns</td>");
-		sb.append("<td class=\"ms-color2-top\">Total</td></tr>");
+		sb.append("<td class=\"ms-color2-top\">Total</td>");
+		sb.append("<td class=\"ms-color2-top\">Cards in hand</td></tr>");
 		for (Player pl : game.getPlayers()) {
 			int towns = 0;
 			for (Location loc : game.getLocations()) {
@@ -44,6 +46,10 @@ public class TurnReportPanel extends DecoratorPanel {
 			int numCards = pl.getHand().size()
 					+ pl.getDrawPile().size()
 					+ pl.getDiscardPile().size();
+			String cardsInHand = "";
+			for (Card card: pl.getHand()){
+				cardsInHand += card.getType().toString() + " ";
+			}
 			sb.append("<tr><td class=\"ms-color2-even\">")
 					.append(pl.getName())
 					.append("</td><td class=\"ms-color2-even\">")
@@ -52,6 +58,8 @@ public class TurnReportPanel extends DecoratorPanel {
 					.append(numCards)
 					.append("</td><td class=\"ms-color2-even\">")
 					.append(towns)
+					.append("</td><td class=\"ms-color2-even\">")
+					.append(cardsInHand)
 					.append("</td><td class=\"ms-color2-even\">")
 					.append(numCards + pl.getKnownSpells().size() * 2
 							+ towns * 3).append("</td></tr>");
