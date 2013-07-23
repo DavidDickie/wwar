@@ -13,7 +13,7 @@ public class DamageHelper implements OrderHelper,java.io.Serializable {
 	public String executeOrder(Game game, boolean server, Order order) {
 
 		Mover mover = game.getMover(order.getMover());
-		Mover dPlayer = game.getMover(order.getDamagePlayer());
+		Mover dPlayer = game.getMover(order.getDamageMover());
 		Location loc1 = game.getLocation(order.getMover().getLocation());
 		Location loc2 = game.getLocation(dPlayer.getLocation());
 

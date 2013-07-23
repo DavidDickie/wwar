@@ -9,7 +9,7 @@ public class OrderCommon implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	public static String assignDamage(Game game, int totDam, Mover mover){
 		if (mover instanceof Player){
-			return assignDamage (game, totDam, mover);
+			return assignDamage (game, totDam, (Player)mover);
 		} else {
 			Golum golum = (Golum) mover;
 			if (golum.getArmor() <= totDam){
