@@ -36,7 +36,6 @@ public class GameEngine {
 		// create players
 		// create locations
 		// populate locations
-		System.out.println("Creating a new demo game");
 		setGame(new Game());
 		new GameHelper().initGame(game, playerNames);
 	}
@@ -206,9 +205,8 @@ public class GameEngine {
 	private void setCards(){
 		for (Player player: game.getPlayers()){
 			player.setTurnComplete(false);
-			player.setPassThroughPoints(player.getPassthrough() + player.getTempPassThrough());
+			player.setPassThroughPoints();
 			player.setArmor(0);
-			player.discardRestOfHand(game);
 			int pull = player.getDrawPile().size();
 			if (pull == 0){
 				pull = player.getDepth() - player.getDamage();

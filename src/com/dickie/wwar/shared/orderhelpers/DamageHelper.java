@@ -18,15 +18,17 @@ public class DamageHelper implements OrderHelper,java.io.Serializable {
 		Location loc2 = game.getLocation(dPlayer.getLocation());
 
 		if (!game.isConnected(loc1.getName(), loc2.getName())){
-			game.addMessage(order.getMover().getOwnerName(), "Location is not connected to casters", true);
+			if (server){
+				game.addMessage(order.getMover().getOwnerName(), "Location is not connected to casters", true);
+			}
 			return "Location is not connected to casters";
 		}
-
 		int totDam = 1;
 		String s = mover.getName() + ": " + OrderCommon.assignDamage(game,totDam, dPlayer);
-		game.addMessage(mover.getOwnerName(), s, true);
-		return s;
-
+		if (server){
+			game.addMessage(mover.getOwnerName(), s, true);
+		}
+		return null;
 	}
 
 }

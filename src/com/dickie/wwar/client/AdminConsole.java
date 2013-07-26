@@ -1,8 +1,8 @@
 package com.dickie.wwar.client;
 
-import com.dickie.wwar.ArmorHelperTest;
 import com.dickie.wwar.shared.Game;
 import com.dickie.wwar.shared.Player;
+import com.dickie.wwar.shared.orderhelpers.ArmorHelperTest;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;

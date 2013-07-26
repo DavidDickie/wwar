@@ -223,6 +223,16 @@ public class Location implements java.io.Serializable, Storable {
 	public String toString(){
 		return "Location " + name;
 	}
+
+	public List<Connection> getConnections(Game g) {
+		ArrayList<Connection> conns = new ArrayList<Connection>();
+		for (Connection c : g.getConnections()){
+			if (c.getStartLocation().equals(this) || c.getEndLocation().equals(this)){
+				conns.add(c);
+			}
+		}
+		return conns;
+	}
 	
 
 }

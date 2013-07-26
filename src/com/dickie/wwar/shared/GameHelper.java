@@ -232,7 +232,6 @@ public class GameHelper {
 					tloc.setX(-tloc.getX());
 					tloc.setY(-tloc.getY());
 				}
-				System.out.println(tloc.getName() + " " + tloc.getX() + ", " + tloc.getY());
 			}
 			
 		}

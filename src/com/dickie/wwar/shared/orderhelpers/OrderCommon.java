@@ -38,7 +38,7 @@ public class OrderCommon implements java.io.Serializable {
 			if (diff < 2){
 				totDam = buffer-2;
 			}
-			dPlayer.setDamage(dPlayer.getDamage()-totDam);
+			dPlayer.setDamage(dPlayer.getDamage()+totDam);
 			return "Did " + totDam + " damage to " + dPlayer.getName();
 		}
 	}

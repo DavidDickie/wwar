@@ -40,7 +40,7 @@ public class OrderEngine {
 	}
 	
 	public String executeSpell(boolean server, Order orderInProgress){
-		System.out.println(orderInProgress.toString());
+		
 		Spell spell = orderInProgress.getSpell();
 		Card.CardType[] cards = orderInProgress.getSpell().cards;
 		List<Card.CardType> aCards = orderInProgress.getSpell().getCards();

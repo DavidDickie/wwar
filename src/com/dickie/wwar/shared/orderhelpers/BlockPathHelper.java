@@ -14,11 +14,8 @@ public class BlockPathHelper implements OrderHelper,java.io.Serializable {
 		if (con == null){
 			return "No path to trap";
 		}
-		if (!con.isConnectedTo(order.getMover().getLocation())){
-			return "You can only cast that on a path you are connected too";
-		}
 		con.setBlocked(true);
-		game.addMessage(order.getOwnerName(), order.getOwnerName() + " traps the connection between " + con.toString(), false);
+		game.addMessage(order.getOwnerName(), order.getOwnerName() + " blocks the connection between " + con.toString(), false);
 		return null;
 		
 	}

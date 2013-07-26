@@ -85,6 +85,16 @@ public class Player implements java.io.Serializable, Mover, Storable {
 		//System.out.println("Bought " + spell.toString());
 		knownSpells.add(spell);
 	}
+	public void removeKnownSpell(Spell spell) {
+		Spell spell2delete = null;
+		for (Spell s : knownSpells){
+			if (s.name.equals(spell.name)){
+				spell2delete = s;
+				break;
+			}
+		}
+		knownSpells.remove(spell2delete);
+	}
 	public int getTempPassThrough() {
 		return tempPassThrough;
 	}
@@ -198,6 +208,9 @@ public class Player implements java.io.Serializable, Mover, Storable {
 	public void setPassThroughPoints(int passThroughPoints) {
 		this.passThroughPoints = passThroughPoints;
 	}
+	public void setPassThroughPoints(){
+		this.passThroughPoints = getPassthrough() + getTempPassThrough();
+	}
 
 	public int getGold() {
 		return gold;
@@ -240,14 +253,6 @@ public class Player implements java.io.Serializable, Mover, Storable {
 		discardPile.add(card);
 	}
 	
-	public void discardRestOfHand(Game game){
-		int totalMana = 0;
-		int totalOther = 0;
-		game.addMessage(getName(), getName() + " held " + getHand().size() + " cards", true);
-		
-
-	}
-	
 	public boolean drawCardFromDraw(){
 		if (drawPile.size() == 0){
 			shuffleDiscardPile();
@@ -282,11 +287,20 @@ public class Player implements java.io.Serializable, Mover, Storable {
 	}
 	
 	public void addCardToHand(String cardType){
+		addCardToHand(CardType.valueOf(cardType));
+	}
+	
+	public void addCardToHand(Card.CardType type){
 		Card card = new Card();
-		card.setType(CardType.valueOf(cardType));
+		card.setType(type);
 		card.setWhere(Card.Where.hand);
 		card.setOwner(this);
 		hand.add(card);
+	}
+	
+	// note this is for testing only
+	public void clearHand(){
+		this.hand = new ArrayList<Card>();
 	}
 	
 	public void addCardToDiscard(String cardType){
