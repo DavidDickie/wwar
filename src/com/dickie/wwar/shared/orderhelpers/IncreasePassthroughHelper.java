@@ -11,7 +11,7 @@ public class IncreasePassthroughHelper implements OrderHelper,java.io.Serializab
 	@Override
 	public String executeOrder(Game game, boolean server, Order order) {
 		Player player = game.getPlayer(order.getOwnerName());
-		if (player.getDepth() > player.getPassthrough()){
+		if (player.getDepth() < player.getPassthrough()){
 			game.addMessage(player.getName(), " needs to increase depth to increase passthrough", true);
 			return player.getName()+ " needs to increase depth to increase passthrough";
 		}

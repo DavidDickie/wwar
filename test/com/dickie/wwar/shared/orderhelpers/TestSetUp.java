@@ -49,6 +49,11 @@ public class TestSetUp {
 		p1.setLocation(game.getLocation(location));
 	}
 	
+	public void setPlayerLocation(Player p1){
+		String loc1 = "Kragaford";
+		p1.setLocation(game.getLocation(loc1));
+	}
+	
 	public void colocatePlayerAndGolem(Player p, Golum g, Game game){
 		String loc1 = "Kragaford";
 		String loc2 = "Myrmack";
