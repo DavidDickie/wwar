@@ -169,15 +169,6 @@ public class AdminConsole extends DecoratorPanel {
 		btnNewButton.setStyleName("button green medium");
 		
 		horizontalPanel.add(btnNewButton);
-		btnRunTests.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				ArmorHelperTest aht = new ArmorHelperTest();
-				aht.test();
-			}
-		});
-		btnRunTests.setStyleName("button green medium");
-		
-		horizontalPanel.add(btnRunTests);
 		
 	}
 	
@@ -229,7 +220,6 @@ public class AdminConsole extends DecoratorPanel {
 	private final HorizontalPanel horizontalPanel_7 = new HorizontalPanel();
 	private final HTML htmlNewHtml = new HTML("New HTML", true);
 	private final Button btnNewButton_1 = new Button("Save");
-	private final Button btnRunTests = new Button("Run Tests");
 	private void changeGameName(final String text) {
 		
 		greetingService.setGameName(game.getName(), text, new AsyncCallback<Void>() {

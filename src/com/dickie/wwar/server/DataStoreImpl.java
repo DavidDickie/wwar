@@ -22,7 +22,7 @@ import com.google.appengine.api.datastore.Query;
 
 public class DataStoreImpl {
 	public List<String> getGameNames(){
-		//clearAll();
+		clearAll();
 		ArrayList<String> names = new ArrayList<String>();
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 		Query q = new Query("Game");
@@ -79,8 +79,11 @@ public class DataStoreImpl {
 		// Use PreparedQuery interface to retrieve results
 		PreparedQuery pq = datastore.prepare(q);
 		for (Entity result : pq.asIterable()) {
-			//System.out.println("Deleting " + result.toString());
-		    datastore.delete(result.getKey());
+			try{
+				datastore.delete(result.getKey());
+			} catch (Exception ex){
+				System.out.println("Could not delete: " + result.toString());
+			}
 		}
 	}
 	

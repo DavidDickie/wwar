@@ -146,6 +146,11 @@ public class GameEngine {
 	}
 	
 	public void doTurn(){
+		if (isEndConditions()){
+			game.getMessages().clear();
+			game.addMessage("Everyone", "Game has ended", true);
+			return;
+		}
 		game.getMessages().clear();
 		System.out.println("starting turn -----------------------------------");
 		clearChangedFlag();
@@ -274,6 +279,46 @@ public class GameEngine {
 				oe.executeOrder(order);
 			}
 		}
+	}
+	
+	private boolean isEndConditions(){
+		// only one player has > 2 health
+		boolean one = false;
+		boolean moreThanOne = false;
+		for (Player player : game.getPlayers()){
+			if (player.getDepth() - player.getDamage() > 2){
+				if (!one){
+					one = true;
+				} else {
+					moreThanOne = true;
+					break;
+				}
+			}
+		}
+		if (!moreThanOne){
+			return true;
+		}
+		// any player has all spells
+		int totSpell = 0;
+		for (Spell spell : Spell.spells()){
+			if (spell.startSpell || spell.isInvisible()){
+				continue;
+			}
+			totSpell++;
+		}
+		for (Player player : game.getPlayers()){
+			if (player.getKnownSpells().size() == totSpell){
+				return true;
+			}
+		}
+		
+		// player controls eight towns
+		for (Player player : game.getPlayers()){
+			if (player.getTownCount(game) >= 8){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 }

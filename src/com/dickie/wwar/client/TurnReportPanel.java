@@ -28,21 +28,7 @@ public class TurnReportPanel extends DecoratorPanel {
 		sb.append("<td class=\"ms-color2-top\">Total</td>");
 		sb.append("<td class=\"ms-color2-top\">Cards in hand</td></tr>");
 		for (Player pl : game.getPlayers()) {
-			int towns = 0;
-			for (Location loc : game.getLocations()) {
-				if (loc.isLocked()) {
-					if (loc.getLockedBy().equals(pl.getName())) {
-						towns++;
-					}
-				} else {
-					List<Mover> ms = game.getMoversAtLocation(loc);
-					if (ms.size() > 0
-							&& ms.get(0).getOwnerName()
-									.equals(pl.getName())) {
-						towns++;
-					}
-				}
-			}
+			int towns = pl.getTownCount(game);
 			int numCards = pl.getHand().size()
 					+ pl.getDrawPile().size()
 					+ pl.getDiscardPile().size();
@@ -59,10 +45,11 @@ public class TurnReportPanel extends DecoratorPanel {
 					.append("</td><td class=\"ms-color2-even\">")
 					.append(towns)
 					.append("</td><td class=\"ms-color2-even\">")
-					.append(cardsInHand)
-					.append("</td><td class=\"ms-color2-even\">")
 					.append(numCards + pl.getKnownSpells().size() * 2
-							+ towns * 3).append("</td></tr>");
+							+ towns * 3)
+					.append("</td><td class=\"ms-color2-even\">")
+					.append(cardsInHand)
+					.append("</td></tr>");
 		}
 		sb.append("</table>");
 		DisplayHtmlDialog.getInstance().display("Player Info", sb.toString());

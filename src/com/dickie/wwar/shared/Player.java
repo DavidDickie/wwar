@@ -397,4 +397,23 @@ public class Player implements java.io.Serializable, Mover, Storable {
 		return false;
 	}
 	
+	public int getTownCount(Game game){
+		int towns = 0;
+		for (Location loc : game.getLocations()) {
+			if (loc.isLocked()) {
+				if (loc.getLockedBy().equals(getName())) {
+					towns++;
+				}
+			} else {
+				List<Mover> ms = game.getMoversAtLocation(loc);
+				if (ms.size() > 0
+						&& ms.get(0).getOwnerName()
+								.equals(getName())) {
+					towns++;
+				}
+			}
+		}
+		return towns;
+	}
+	
 }
